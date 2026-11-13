@@ -1,18 +1,10 @@
 module stokesjl
+include("StokesTypes.jl")
 
 export wave1d, convect1d, convect1d_nl, diffuse1d, burgers, Δx
 
 using Plots
-
-Base.@kwdef mutable struct wave1d
-    u::Vector{Float64}
-    x::Vector{Float64} = collect(range(0, 1, length=length(u)))
-    c::Float64 = 1.0
-    ν::Float64 = .3
-end
-
-n(model::wave1d) = length(model.u)
-Δx(model::wave1d) = (model.x[end] - model.x[1]) / (n(model) - 1)
+using .StokesTypes
 
 function convect1d_nl(model::wave1d, start_time, end_time, Δt)
     sz = n(model)
@@ -132,5 +124,4 @@ function burgers(model::wave1d, analytical, start_time, end_time, Δt)
     end
     gif(anim, "results/burgers.gif", fps=5)
 end
-
 end # module stokesjl
