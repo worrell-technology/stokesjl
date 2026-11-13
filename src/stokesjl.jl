@@ -110,7 +110,7 @@ function burgers(model::wave1d, analytical, start_time, end_time, Δt)
                 ylabel="u",
                 linewidth=2,
                 title="Time = $(round(t, digits=3))",
-                label="Numberical"
+                label="Numerical"
         )
 
         plot!(p, model.x, u_analytical,
