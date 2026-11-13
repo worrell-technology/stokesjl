@@ -5,7 +5,7 @@ export Model, wave1d, init_coords
 export dt, cfl, n, Δx
 
 export convect1d, convect1d_nl, diffuse1d, burgers
-export convect2d
+export convect2d, convect2d_nl
 
 using Plots
 using .StokesTypes
@@ -160,8 +160,61 @@ function convect2d(m::Model, start_time::Float64, end_time::Float64)
             end
         end
         t += m.Δt
-    end
+    end every 10
     gif(anim, "results/convect2d.gif", fps=5)
+end
+
+function convect2d_nl(m::Model, start_time::Float64, end_time::Float64)
+    t = start_time
+    anim = @animate while t <= end_time
+        un = copy(m.u)
+        vn = copy(m.v)
+
+        s2 = surface(
+            m.coords.x,
+            m.coords.y,
+            m.v,
+            color = :plasma,
+            xlabel = "X",
+            ylabel = "Y",
+            zlabel = "V",
+            title="Time = $(round(t, digits=3))",
+            camera = (45, 45),
+        )
+
+        s1 = surface(
+            m.coords.x,
+            m.coords.y,
+            m.u,
+            color = :viridis,
+            xlabel = "X",
+            ylabel = "Y",
+            zlabel = "U",
+            camera = (45, 45),
+        )
+
+        plot(s2, s1, layout = (2, 1), size = (1100, 1000), dpi=100)
+
+        rows, cols = size(un)
+        for j in range(2, cols)
+            for i in range(2, rows)
+                m.u[i, j] = (un[i, j] - (vn[i,j] * (un[i, j] - un[i, j - 1]) * m.Δt / m.coords.dy) - 
+                                        (un[i,j] * (un[i, j] - un[i-1, j]) * m.Δt / m.coords.dx))
+                m.v[i, j] = (vn[i, j] - (vn[i,j] * (vn[i, j] - vn[i, j - 1]) * m.Δt / m.coords.dy) - 
+                                        (un[i,j] * (vn[i, j] - vn[i-1, j]) * m.Δt / m.coords.dx))
+                m.u[1,:] .= 1
+                m.u[end, :] .= 1
+                m.u[:, 1] .= 1
+                m.u[:, end] .= 1
+                m.v[1,:] .= 1
+                m.v[end, :] .= 1
+                m.v[:, 1] .= 1
+                m.v[:, end] .= 1
+            end
+        end
+        t += m.Δt
+    end every 10
+    gif(anim, "results/convect2d_nl.gif", fps=5)
 end
 
 end # module stokesjl

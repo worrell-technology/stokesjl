@@ -42,8 +42,12 @@ init_coords(x::Vector{Float64}, y::Vector{Float64}) =
 Base.@kwdef mutable struct Model
     coords::Coords2d
     u::Matrix{Float64} = ones(
-        length(coords.y),
-        length(coords.x)
+        length(coords.x),
+        length(coords.y)
+    )
+    v::Matrix{Float64} = ones(
+        length(coords.x),
+        length(coords.y)
     )
     cx::Float64 = 1.0
     cy::Float64 = 1.0
