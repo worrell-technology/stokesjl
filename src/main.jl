@@ -47,14 +47,18 @@ dx = Δx(model)
 Δt = 0.5 * dx * model.ν
 p = plot(x, u)
 savefig(p, "sawtooth.png")
+# burgers(model, f, 0.0, 1.0, Δt)
 @show minimum(model.u)
 @show maximum(model.u)
 @show model.ν
 @show Δx(model)
 @show Δt
-burgers(model, f, 0.0, 1.0, Δt)
-@show minimum(model.u)
-@show maximum(model.u)
-@show model.ν
-@show Δx(model)
-@show Δt
+
+# 2D Convection
+m = Model(coords=init_coords((0.0, 2.0), 81, (0.0, 2.0), 81))
+u = ones(length(m.coords.y), length(m.coords.x))
+u[round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1,
+  round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1] .= 2
+m.u = u
+
+convect2d(m)

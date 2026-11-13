@@ -1,7 +1,11 @@
 module stokesjl
 include("StokesTypes.jl")
 
-export wave1d, convect1d, convect1d_nl, diffuse1d, burgers, Δx
+export Model, wave1d, init_coords
+export dt, cfl, n, Δx
+
+export convect1d, convect1d_nl, diffuse1d, burgers
+export convect2d
 
 using Plots
 using .StokesTypes
@@ -124,4 +128,21 @@ function burgers(model::wave1d, analytical, start_time, end_time, Δt)
     end
     gif(anim, "results/burgers.gif", fps=5)
 end
+
+function convect2d(m::Model)
+    p = surface(
+        m.coords.x,
+        m.coords.y,
+        m.u,
+        color = :viridis,
+        xlabel = "X",
+        ylabel = "Y",
+        zlabel = "U",
+        title = "Initial Condition",
+        camera = (45, 45),
+        size = (1100, 700)
+    )
+    savefig(p, "ic3d.png")
+end
+
 end # module stokesjl

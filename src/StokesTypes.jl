@@ -28,19 +28,26 @@ Base.@kwdef struct Coords2d
     dy::Float64 = (y[end] - y[1]) / (_y_pars.n - 1)
 end
 
-init_coords(x_pars::CoordParams, y_pars::CoordParams) = Coords2d(x_pars, y_pars)
+init_coords(x::Tuple{Float64, Float64}, nx::Int, y::Tuple{Float64, Float64}, ny::Int) = 
+    Coords2d(_x_pars=CoordParams(x[1], x[2], nx),
+        _y_pars=CoordParams(y[1], y[2], ny))
+init_coords(x_pars::CoordParams, y_pars::CoordParams) =
+    Coords2d(_x_pars = x_pars, _y_pars = y_pars)
 init_coords(x::Vector{Float64}, y::Vector{Float64}) = 
-    Coords2d(CoordParams(x[1], x[end], length(x)),
-            CoordParams(y[1], y[end], length(y)),
-            x, y)
+    Coords2d(_x_pars=CoordParams(x[1], x[end], length(x)),
+        _y_pars=CoordParams(y[1], y[end], length(y)),
+        x=x, y=y)
 
 # Main Model Type
 Base.@kwdef mutable struct Model
-    u::Matrix{Float64}
     coords::Coords2d
+    u::Matrix{Float64} = ones(
+        length(coords.y),
+        length(coords.x)
+    )
     cx::Float64 = 1.0
     cy::Float64 = 1.0
-    Δt::Float64 = _dt(0.05, cx, cy, coords.dx, coords.dy)
+    Δt::Float64 = _dt(0.25, cx, cy, coords.dx, coords.dy)
 end
 
 cfl(m::Model) = m.Δt * (m.cx/m.coords.dx + m.cy/m.coords.dy) 
