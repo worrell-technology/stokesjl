@@ -1,7 +1,7 @@
 module StokesTypes
 
 export Model, wave1d, init_coords
-export dt, cfl, n, Δx
+export dt, cfl, n, Δx, nx, ny
 
 Base.@kwdef mutable struct wave1d
     u::Vector{Float64}
@@ -53,5 +53,7 @@ end
 cfl(m::Model) = m.Δt * (m.cx/m.coords.dx + m.cy/m.coords.dy) 
 dt(m::Model, c::Float64) = c / (m.cx/m.coords.dx + m.cy/m.coords.dy) 
 _dt(σ, cx, cy, dx, dy) = σ / (cx/dx + cy/dy) 
+nx(m::Model) = m.coords._x_pars.n
+ny(m::Model) = m.coords._y_pars.n
 
 end # module StokesTypes

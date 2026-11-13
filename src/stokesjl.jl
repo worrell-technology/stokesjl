@@ -129,20 +129,39 @@ function burgers(model::wave1d, analytical, start_time, end_time, Δt)
     gif(anim, "results/burgers.gif", fps=5)
 end
 
-function convect2d(m::Model)
-    p = surface(
-        m.coords.x,
-        m.coords.y,
-        m.u,
-        color = :viridis,
-        xlabel = "X",
-        ylabel = "Y",
-        zlabel = "U",
-        title = "Initial Condition",
-        camera = (45, 45),
-        size = (1100, 700)
-    )
-    savefig(p, "ic3d.png")
+function convect2d(m::Model, start_time::Float64, end_time::Float64)
+    t = start_time
+    anim = @animate while t <= end_time
+        un = copy(m.u)
+
+        surface(
+            m.coords.x,
+            m.coords.y,
+            m.u,
+            color = :viridis,
+            xlabel = "X",
+            ylabel = "Y",
+            zlabel = "U",
+            title="Time = $(round(t, digits=3))",
+            camera = (45, 45),
+            size = (1100, 700),
+            dpi=100
+        )
+
+        rows, cols = size(un)
+        for j in range(2, cols)
+            for i in range(2, rows)
+                m.u[i, j] = (un[i, j] - (m.cy * (un[i, j] - un[i, j - 1]) * m.Δt / m.coords.dy) - 
+                                        (m.cx * (un[i, j] - un[i-1, j]) * m.Δt / m.coords.dx))
+                m.u[1,:] .= 1
+                m.u[end, :] .= 1
+                m.u[:, 1] .= 1
+                m.u[:, end] .= 1
+            end
+        end
+        t += m.Δt
+    end
+    gif(anim, "results/convect2d.gif", fps=5)
 end
 
 end # module stokesjl

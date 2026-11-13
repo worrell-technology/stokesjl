@@ -56,9 +56,9 @@ savefig(p, "sawtooth.png")
 
 # 2D Convection
 m = Model(coords=init_coords((0.0, 2.0), 81, (0.0, 2.0), 81))
-u = ones(length(m.coords.y), length(m.coords.x))
-u[round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1,
-  round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1] .= 2
+u = ones(length(m.coords.x), length(m.coords.y))
+u[round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1,
+  round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1] .= 2
 m.u = u
 
-convect2d(m)
+convect2d(m, 0.0, 1.0)
