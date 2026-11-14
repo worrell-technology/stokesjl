@@ -5,7 +5,7 @@ export Model, wave1d, init_coords
 export dt, cfl, n, Δx
 
 export convect1d, convect1d_nl, diffuse1d, burgers
-export convect2d, convect2d_nl
+export convect2d, convect2d_nl, diffuse2d
 
 using Plots
 using .StokesTypes
@@ -215,6 +215,43 @@ function convect2d_nl(m::Model, start_time::Float64, end_time::Float64)
         t += m.Δt
     end every 10
     gif(anim, "results/convect2d_nl.gif", fps=5)
+end
+
+function diffuse2d(m::Model, start_time::Float64, end_time::Float64)
+    t = start_time
+    anim = @animate while t <= end_time
+        un = copy(m.u)
+
+        s1 = surface(
+            m.coords.x,
+            m.coords.y,
+            m.u,
+            color = :viridis,
+            xlabel = "X",
+            ylabel = "Y",
+            zlabel = "U",
+            camera = (45, 45),
+        )
+
+        plot(s1, size = (1100, 1000), dpi=100)
+
+        rows, cols = size(un)
+        for j in range(2, cols - 1)
+            for i in range(2, rows - 1)
+                m.u[i,j] = un[i,j] + 
+                    (m.νx * (un[i+1, j] - 2*un[i,j] + un[i-1, j])*m.Δt/(m.coords.dx^2)) +
+                    (m.νy * (un[i, j+1] - 2*un[i,j] + un[i, j-1])*m.Δt/(m.coords.dy^2))
+
+
+                m.u[1,:] .= 1
+                m.u[end, :] .= 1
+                m.u[:, 1] .= 1
+                m.u[:, end] .= 1
+            end
+        end
+        t += m.Δt
+    end every 10
+    gif(anim, "results/diffuse2d.gif", fps=5)
 end
 
 end # module stokesjl

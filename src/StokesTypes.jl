@@ -50,7 +50,9 @@ Base.@kwdef mutable struct Model
         length(coords.y)
     )
     cx::Float64 = 1.0
+    νx::Float64 = 0.05
     cy::Float64 = 1.0
+    νy::Float64 = 0.05
     Δt::Float64 = _dt(0.25, cx, cy, coords.dx, coords.dy)
 end
 

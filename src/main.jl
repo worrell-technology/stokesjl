@@ -73,3 +73,15 @@ u[round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1,
   round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1] .= 2
 m.u = u
 convect2d_nl(m, 0.0, 1.0)
+
+# 2D Diffusion
+#  re-initialize state
+v = ones(length(m.coords.x), length(m.coords.y))
+v[round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1,
+  round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1] .= 2
+m.v = v
+u = ones(length(m.coords.x), length(m.coords.y))
+u[round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1,
+  round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1] .= 2
+m.u = u
+diffuse2d(m, 0.0, 1.0)
