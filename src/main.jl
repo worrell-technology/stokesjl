@@ -2,19 +2,6 @@ include("stokesjl.jl")
 
 using .stokesjl
 
-using Symbolics
-using Plots
-
-function build_sawtooth()
-    @variables x, ν, t
-    ϕ = exp(-(x - 4*t)^2 / (4 * ν * (t + 1))) +
-        exp(-(x -4*t -2*pi)^2 / (4 * ν * (t + 1))) 
-    δϕ = Differential(x)(ϕ)
-    δϕ = expand_derivatives(δϕ)
-    u = -2 * ν * (δϕ / ϕ) + 4
-    return build_function(u, [x, ν, t]; expression = Val{false})
-end
-
 # 1D Convection
 x = collect(range(0, 2, length=41))
 u = [0.5 <= xi <= 1.0 ? 2.0 : 1.0 for xi in x]
@@ -45,8 +32,6 @@ u = [f(xi, model.ν, 0) for xi in x]
 model.u = u
 dx = Δx(model)
 Δt = 0.5 * dx * model.ν
-p = plot(x, u)
-savefig(p, "sawtooth.png")
 # burgers(model, f, 0.0, 1.0, Δt)
 @show minimum(model.u)
 @show maximum(model.u)
@@ -85,3 +70,16 @@ u[round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1,
   round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1] .= 2
 m.u = u
 diffuse2d(m, 0.0, 1.0)
+
+# 2D Burgers
+#  re-initialize state
+v = ones(length(m.coords.x), length(m.coords.y))
+v[round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1,
+  round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1] .= 2
+m.v = v
+u = ones(length(m.coords.x), length(m.coords.y))
+u[round(Int, 0.5/m.coords.dx)+1 : round(Int, 1/m.coords.dx)+1,
+  round(Int, 0.5/m.coords.dy)+1 : round(Int, 1/m.coords.dy)+1] .= 2
+m.u = u
+m.Δt = dt(m, 0.09)
+burgers2d(m, 0.0, 1.0)
